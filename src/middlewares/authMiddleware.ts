@@ -1,14 +1,17 @@
 import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+
+const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-key-change-in-production";
 
 // Interface untuk extend Request dengan user
 export interface AuthRequest extends Request {
     user?: {
         id: number;
-        email: string;
+        nim: string;
     };
 }
 
-// Middleware untuk validasi token (simplified version)
+// Middleware untuk validasi JWT token
 export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
 
@@ -22,37 +25,18 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
         return res.status(401).json({ message: "Format token tidak valid" });
     }
 
-    // Validasi token sederhana (dalam production gunakan JWT)
-    if (!token.startsWith("dummy-token-")) {
-        return res.status(401).json({ message: "Token tidak valid" });
+    try {
+        // Verifikasi JWT token
+        const decoded = jwt.verify(token, JWT_SECRET) as { id: number; nim: string };
+
+        // Set user di request
+        req.user = {
+            id: decoded.id,
+            nim: decoded.nim,
+        };
+
+        next();
+    } catch (error) {
+        return res.status(401).json({ message: "Token tidak valid atau sudah kadaluarsa" });
     }
-
-    // Extract user ID dari token
-    const userId = parseInt(token.replace("dummy-token-", ""));
-    if (isNaN(userId)) {
-        return res.status(401).json({ message: "Token tidak valid" });
-    }
-
-    // Set user di request
-    req.user = {
-        id: userId,
-        email: "", // Dalam production, ambil dari database
-    };
-
-    next();
-};
-
-// Middleware untuk validasi admin (optional)
-export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
-    // Implementasi sederhana - dalam production cek role dari database
-    if (!req.user) {
-        return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    // Contoh: user dengan ID 1 adalah admin
-    if (req.user.id !== 1) {
-        return res.status(403).json({ message: "Forbidden - Admin only" });
-    }
-
-    next();
 };

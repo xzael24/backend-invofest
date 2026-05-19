@@ -1,96 +1,148 @@
 import { Request, Response } from "express";
-import { Seminar } from "../types/seminar";
+import { prisma } from "../lib/db.js";
 
-let seminars: Seminar[] = [];
-let currentId = 1;
+// CREATE Seminar
+export const createSeminar = async (req: Request, res: Response) => {
+    try {
+        const { title, description, date, time, location, speaker, category, maxParticipants } = req.body;
 
-export const getSeminars = (req: Request, res: Response) => {
-    res.json(seminars);
+        if (!title || !description || !date || !time || !location || !speaker || !category) {
+            return res.status(400).json({ message: "Semua field wajib diisi kecuali maxParticipants" });
+        }
+
+        const newSeminar = await prisma.seminar.create({
+            data: {
+                title,
+                description,
+                date: new Date(date),
+                time,
+                location,
+                speakerId: parseInt(speaker),
+                categoryId: parseInt(category),
+                maxParticipants: maxParticipants || 100,
+                registeredParticipants: 0,
+            },
+        });
+
+        res.status(201).json({ message: "Seminar berhasil dibuat", data: newSeminar });
+    } catch (error) {
+        res.status(500).json({ message: "Gagal membuat seminar", error });
+    }
 };
 
-export const createSeminar = (req: Request, res: Response) => {
-    const { title, description, date, time, location, speaker, category, maxParticipants } = req.body;
-
-    if (!title || !description || !date || !time || !location || !speaker || !category) {
-        return res.status(400).json({ message: "Semua field wajib diisi kecuali maxParticipants" });
+// READ All Seminars
+export const getSeminars = async (req: Request, res: Response) => {
+    try {
+        const seminars = await prisma.seminar.findMany({
+            orderBy: { createdAt: "desc" },
+            include: {
+                speaker: true,
+                category: true,
+            },
+        });
+        res.json(seminars);
+    } catch (error) {
+        res.status(500).json({ message: "Gagal mengambil data seminar", error });
     }
-
-    const newSeminar: Seminar = {
-        id: currentId++,
-        title,
-        description,
-        date: new Date(date),
-        time,
-        location,
-        speaker: parseInt(speaker),
-        category: parseInt(category),
-        maxParticipants: maxParticipants || 100,
-        registeredParticipants: 0,
-    };
-
-    seminars.push(newSeminar);
-    res.status(201).json(newSeminar);
 };
 
-export const getSeminarById = (req: Request, res: Response) => {
-    const { id } = req.params;
-    const seminar = seminars.find((s) => s.id === parseInt(id as string));
+// READ Single Seminar
+export const getSeminarById = async (req: Request, res: Response) => {
+    try {
+        const id = Number(req.params.id);
+        const seminar = await prisma.seminar.findUnique({
+            where: { id },
+            include: {
+                speaker: true,
+                category: true,
+            },
+        });
 
-    if (!seminar) {
-        return res.status(404).json({ message: "Seminar tidak ditemukan" });
+        if (!seminar) {
+            return res.status(404).json({ message: "Seminar tidak ditemukan" });
+        }
+
+        res.json(seminar);
+    } catch (error) {
+        res.status(500).json({ message: "Gagal mengambil detail seminar", error });
     }
-
-    res.json(seminar);
 };
 
-export const updateSeminar = (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { title, description, date, time, location, speaker, category, maxParticipants } = req.body;
+// UPDATE Seminar
+export const updateSeminar = async (req: Request, res: Response) => {
+    try {
+        const id = Number(req.params.id);
+        const existingSeminar = await prisma.seminar.findUnique({ where: { id } });
 
-    const seminar = seminars.find((s) => s.id === parseInt(id as string));
-    if (!seminar) {
-        return res.status(404).json({ message: "Seminar tidak ditemukan" });
+        if (!existingSeminar) {
+            return res.status(404).json({ message: "Seminar tidak ditemukan" });
+        }
+
+        const { title, description, date, time, location, speaker, category, maxParticipants } = req.body;
+
+        const updatedSeminar = await prisma.seminar.update({
+            where: { id },
+            data: {
+                title: title ?? existingSeminar.title,
+                description: description ?? existingSeminar.description,
+                date: date ? new Date(date) : existingSeminar.date,
+                time: time ?? existingSeminar.time,
+                location: location ?? existingSeminar.location,
+                speakerId: speaker ? parseInt(speaker) : existingSeminar.speakerId,
+                categoryId: category ? parseInt(category) : existingSeminar.categoryId,
+                maxParticipants: maxParticipants ?? existingSeminar.maxParticipants,
+            },
+        });
+
+        res.json({ message: "Seminar berhasil diupdate", data: updatedSeminar });
+    } catch (error) {
+        res.status(500).json({ message: "Gagal update seminar", error });
     }
-
-    if (title) seminar.title = title;
-    if (description) seminar.description = description;
-    if (date) seminar.date = new Date(date);
-    if (time) seminar.time = time;
-    if (location) seminar.location = location;
-    if (speaker) seminar.speaker = parseInt(speaker);
-    if (category) seminar.category = parseInt(category);
-    if (maxParticipants) seminar.maxParticipants = maxParticipants;
-
-    res.json(seminar);
 };
 
-export const deleteSeminar = (req: Request, res: Response) => {
-    const { id } = req.params;
-    const index = seminars.findIndex((s) => s.id === parseInt(id as string));
+// DELETE Seminar
+export const deleteSeminar = async (req: Request, res: Response) => {
+    try {
+        const id = Number(req.params.id);
+        const existingSeminar = await prisma.seminar.findUnique({ where: { id } });
 
-    if (index === -1) {
-        return res.status(404).json({ message: "Seminar tidak ditemukan" });
+        if (!existingSeminar) {
+            return res.status(404).json({ message: "Seminar tidak ditemukan" });
+        }
+
+        await prisma.seminar.delete({ where: { id } });
+        res.json({ message: "Seminar berhasil dihapus" });
+    } catch (error) {
+        res.status(500).json({ message: "Gagal menghapus seminar", error });
     }
-
-    seminars.splice(index, 1);
-    res.status(204).send();
 };
 
-export const registerToSeminar = (req: Request, res: Response) => {
-    const { id } = req.params;
-    const seminar = seminars.find((s) => s.id === parseInt(id as string));
+// REGISTER to Seminar
+export const registerToSeminar = async (req: Request, res: Response) => {
+    try {
+        const id = Number(req.params.id);
+        const seminar = await prisma.seminar.findUnique({ where: { id } });
 
-    if (!seminar) {
-        return res.status(404).json({ message: "Seminar tidak ditemukan" });
+        if (!seminar) {
+            return res.status(404).json({ message: "Seminar tidak ditemukan" });
+        }
+
+        if (seminar.registeredParticipants >= seminar.maxParticipants) {
+            return res.status(400).json({ message: "Seminar sudah penuh" });
+        }
+
+        const updatedSeminar = await prisma.seminar.update({
+            where: { id },
+            data: {
+                registeredParticipants: seminar.registeredParticipants + 1,
+            },
+        });
+
+        res.json({
+            message: "Berhasil mendaftar ke seminar",
+            seminar: updatedSeminar,
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Gagal mendaftar ke seminar", error });
     }
-
-    if (seminar.registeredParticipants >= seminar.maxParticipants) {
-        return res.status(400).json({ message: "Seminar sudah penuh" });
-    }
-
-    seminar.registeredParticipants++;
-    res.json({
-        message: "Berhasil mendaftar ke seminar",
-        seminar,
-    });
 };

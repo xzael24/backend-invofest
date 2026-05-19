@@ -1,18 +1,22 @@
 import express from "express";
+import { authenticate } from "../middlewares/authMiddleware.js";
 import {
     getPembicaras,
     createPembicara,
     getPembicaraById,
     updatePembicara,
     deletePembicara,
-} from "../controllers/pembicaraController";
+} from "../controllers/pembicaraController.js";
 
 const router = express.Router();
 
+// GET routes — publik (tanpa auth)
 router.get("/", getPembicaras);
-router.post("/", createPembicara);
 router.get("/:id", getPembicaraById);
-router.put("/:id", updatePembicara);
-router.delete("/:id", deletePembicara);
+
+// POST, PUT, DELETE — dilindungi auth middleware
+router.post("/", authenticate, createPembicara);
+router.put("/:id", authenticate, updatePembicara);
+router.delete("/:id", authenticate, deletePembicara);
 
 export default router;

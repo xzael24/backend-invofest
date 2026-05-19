@@ -6,7 +6,7 @@ import {
     updateSeminar,
     deleteSeminar,
     registerToSeminar,
-} from "../controllers/seminarController";
+} from "../controllers/seminarController.js";
 
 const router = express.Router();
 

@@ -1,88 +1,102 @@
 import { Request, Response } from "express";
-import { Pembicara } from "../types/pembicara";
+import { prisma } from "../lib/db.js";
+import { Pembicara } from "../types/pembicara.js";
 
-let pembicaras: Pembicara[] = [
-    {
-        id: 1,
-        name: "Dr. Ahmad Zainudin",
-        title: "AI Research Scientist",
-        bio: "Expert in Machine Learning and Artificial Intelligence with 10+ years of experience",
-        photo: "/assets/zaim.png",
-        expertise: ["Machine Learning", "Deep Learning", "AI Ethics"],
-    },
-    {
-        id: 2,
-        name: "Siti Nurhaliza, M.Kom",
-        title: "Senior Software Engineer",
-        bio: "Full-stack developer specializing in modern web technologies",
-        photo: "/assets/lhuqita.png",
-        expertise: ["React", "Node.js", "Cloud Computing"],
-    },
-];
+// CREATE Pembicara
+export const createPembicara = async (req: Request, res: Response) => {
+    try {
+        const { name, title, bio, photo, expertise } = req.body as Pembicara;
 
-let currentId = 3;
+        if (!name || !title || !bio) {
+            return res.status(400).json({ message: "Nama, title, dan bio wajib diisi" });
+        }
 
-export const getPembicaras = (req: Request, res: Response) => {
-    res.json(pembicaras);
+        const newPembicara = await prisma.pembicara.create({
+            data: {
+                name,
+                title,
+                bio,
+                photo: photo || "",
+                expertise: expertise || [],
+            },
+        });
+
+        res.status(201).json({ message: "Pembicara berhasil dibuat", data: newPembicara });
+    } catch (error) {
+        res.status(500).json({ message: "Gagal membuat pembicara", error });
+    }
 };
 
-export const createPembicara = (req: Request, res: Response) => {
-    const { name, title, bio, photo, expertise } = req.body;
-
-    if (!name || !title || !bio) {
-        return res.status(400).json({ message: "Nama, title, dan bio wajib diisi" });
+// READ All Pembicaras
+export const getPembicaras = async (req: Request, res: Response) => {
+    try {
+        const pembicaras = await prisma.pembicara.findMany({
+            orderBy: { createdAt: "desc" },
+        });
+        res.json(pembicaras);
+    } catch (error) {
+        res.status(500).json({ message: "Gagal mengambil data pembicara", error });
     }
-
-    const newPembicara: Pembicara = {
-        id: currentId++,
-        name,
-        title,
-        bio,
-        photo: photo || "",
-        expertise: expertise || [],
-    };
-
-    pembicaras.push(newPembicara);
-    res.status(201).json(newPembicara);
 };
 
-export const getPembicaraById = (req: Request, res: Response) => {
-    const { id } = req.params;
-    const pembicara = pembicaras.find((p) => p.id === parseInt(id as string));
+// READ Single Pembicara
+export const getPembicaraById = async (req: Request, res: Response) => {
+    try {
+        const id = Number(req.params.id);
+        const pembicara = await prisma.pembicara.findUnique({ where: { id } });
 
-    if (!pembicara) {
-        return res.status(404).json({ message: "Pembicara tidak ditemukan" });
+        if (!pembicara) {
+            return res.status(404).json({ message: "Pembicara tidak ditemukan" });
+        }
+
+        res.json(pembicara);
+    } catch (error) {
+        res.status(500).json({ message: "Gagal mengambil detail pembicara", error });
     }
-
-    res.json(pembicara);
 };
 
-export const updatePembicara = (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { name, title, bio, photo, expertise } = req.body;
+// UPDATE Pembicara
+export const updatePembicara = async (req: Request, res: Response) => {
+    try {
+        const id = Number(req.params.id);
+        const existingPembicara = await prisma.pembicara.findUnique({ where: { id } });
 
-    const pembicara = pembicaras.find((p) => p.id === parseInt(id as string));
-    if (!pembicara) {
-        return res.status(404).json({ message: "Pembicara tidak ditemukan" });
+        if (!existingPembicara) {
+            return res.status(404).json({ message: "Pembicara tidak ditemukan" });
+        }
+
+        const { name, title, bio, photo, expertise } = req.body as Pembicara;
+
+        const updatedPembicara = await prisma.pembicara.update({
+            where: { id },
+            data: {
+                name: name ?? existingPembicara.name,
+                title: title ?? existingPembicara.title,
+                bio: bio ?? existingPembicara.bio,
+                photo: photo ?? existingPembicara.photo,
+                expertise: expertise ?? existingPembicara.expertise,
+            },
+        });
+
+        res.json({ message: "Pembicara berhasil diupdate", data: updatedPembicara });
+    } catch (error) {
+        res.status(500).json({ message: "Gagal update pembicara", error });
     }
-
-    if (name) pembicara.name = name;
-    if (title) pembicara.title = title;
-    if (bio) pembicara.bio = bio;
-    if (photo) pembicara.photo = photo;
-    if (expertise) pembicara.expertise = expertise;
-
-    res.json(pembicara);
 };
 
-export const deletePembicara = (req: Request, res: Response) => {
-    const { id } = req.params;
-    const index = pembicaras.findIndex((p) => p.id === parseInt(id as string));
+// DELETE Pembicara
+export const deletePembicara = async (req: Request, res: Response) => {
+    try {
+        const id = Number(req.params.id);
+        const existingPembicara = await prisma.pembicara.findUnique({ where: { id } });
 
-    if (index === -1) {
-        return res.status(404).json({ message: "Pembicara tidak ditemukan" });
+        if (!existingPembicara) {
+            return res.status(404).json({ message: "Pembicara tidak ditemukan" });
+        }
+
+        await prisma.pembicara.delete({ where: { id } });
+        res.json({ message: "Pembicara berhasil dihapus" });
+    } catch (error) {
+        res.status(500).json({ message: "Gagal menghapus pembicara", error });
     }
-
-    pembicaras.splice(index, 1);
-    res.status(204).send();
 };

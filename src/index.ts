@@ -1,11 +1,11 @@
 import express from "express";
 import cors from "cors";
 
-import eventRoutes from "./routes/eventRoutes";
-import categoryRoutes from "./routes/categoryRoutes";
-import userRoutes from "./routes/userRoutes";
-import pembicaraRoutes from "./routes/pembicaraRoutes";
-import seminarRoutes from "./routes/seminarRoutes";
+import eventRoutes from "./routes/eventRoutes.js";
+import categoryRoutes from "./routes/categoryRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import pembicaraRoutes from "./routes/pembicaraRoutes.js";
+import seminarRoutes from "./routes/seminarRoutes.js";
 
 const app = express();
 const port = 3000;
@@ -23,7 +23,7 @@ app.use("/api/seminars", seminarRoutes);
 app.get("/", (req, res) => {
     res.json({
         message: "API INVOFEST",
-        version: "1.0.0",
+        version: "2.0.0 — Prisma + Supabase PostgreSQL",
         endpoints: {
             users: "/api/users",
             events: "/api/events",

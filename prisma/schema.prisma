@@ -1,0 +1,94 @@
+// 1. Generator: library yang akan dihasilkan
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 2. Datasource: jenis database yang digunakan
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// 3. Models: definisi tabel
+
+// Tabel 1: CategoryEvent — kategori event
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relasi: satu category bisa punya banyak event & seminar
+  events   Event[]
+  seminars Seminar[]
+
+  @@map("categories")
+}
+
+// Tabel 2: Pembicara — data pembicara/speaker
+model Pembicara {
+  id        Int      @id @default(autoincrement())
+  name      String
+  title     String
+  bio       String   @db.Text
+  photo     String   @default("")
+  expertise String[] @default([])
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relasi: satu pembicara bisa jadi speaker di banyak seminar & event
+  seminars Seminar[]
+  events   Event[]
+
+  @@map("pembicaras")
+}
+
+// Tabel 3: Event — data event dengan FK ke Category dan Pembicara
+model Event {
+  id           Int      @id @default(autoincrement())
+  name         String
+  categoryId   Int      @map("category_id")
+  pembicaraId  Int      @map("pembicara_id")
+  location     String
+  dateEvent    DateTime @map("date_event")
+  description  String   @db.Text
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relasi ke Category & Pembicara (Foreign Key)
+  category  Category  @relation(fields: [categoryId], references: [id])
+  pembicara Pembicara @relation(fields: [pembicaraId], references: [id])
+
+  @@map("events")
+}
+
+// Tabel User: untuk autentikasi login via NIM
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  nim       String   @unique
+  password  String
+  bio       String   @db.Text
+  event     String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("users")
+}
+
+model Seminar {
+  id                      Int      @id @default(autoincrement())
+  title                   String
+  description             String   @db.Text
+  date                    DateTime
+  time                    String
+  location                String
+  speakerId               Int      @map("speaker_id")
+  categoryId              Int      @map("category_id")
+  maxParticipants         Int      @default(100) @map("max_participants")
+  registeredParticipants  Int      @default(0) @map("registered_participants")
+  createdAt               DateTime @default(now()) @map("created_at")
+
+  // Relasi
+  speaker  Pembicara @relation(fields: [speakerId], references: [id])
+  category Category  @relation(fields: [categoryId], references: [id])
+
+  @@map("seminars")
+}
