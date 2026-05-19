@@ -2,14 +2,14 @@
 
 Backend API untuk aplikasi INVOFEST (Informatics Vocational Festival) - festival tahunan yang bertujuan untuk menginspirasi dan memberdayakan generasi muda Indonesia dalam menghadapi era digital.
 
-## 🚀 Teknologi
+## Teknologi
 
 - **Node.js** dengan **Express.js**
 - **TypeScript** untuk type safety
 - **CORS** untuk cross-origin requests
 - In-memory storage (untuk development)
 
-## 📦 Instalasi
+## Instalasi
 
 ```bash
 # Install dependencies
@@ -21,14 +21,14 @@ npm run dev
 
 Server akan berjalan di `http://localhost:3000`
 
-## 📚 API Endpoints
+## API Endpoints
 
 ### Base URL
 ```
 http://localhost:3000/api
 ```
 
-### 🔐 Authentication & Users
+### Authentication & Users
 
 #### Register User
 ```http
@@ -103,7 +103,7 @@ DELETE /api/users/:id
 
 ---
 
-### 📂 Categories
+### Categories
 
 #### Get All Categories
 ```http
@@ -142,7 +142,7 @@ DELETE /api/categories/:id
 
 ---
 
-### 🎯 Events
+### Events
 
 #### Get All Events
 ```http
@@ -245,7 +245,7 @@ DELETE /api/pembicaras/:id
 
 ---
 
-### 🎓 Seminars
+### Seminars
 
 #### Get All Seminars
 ```http
@@ -310,7 +310,7 @@ POST /api/seminars/:id/register
 
 ---
 
-## 🔒 Authentication Middleware
+## Authentication Middleware
 
 Untuk endpoint yang memerlukan authentication, tambahkan header:
 
@@ -327,7 +327,7 @@ router.post("/", authenticate, createEvent);
 
 ---
 
-## 📝 Validasi
+## Validasi
 
 ### Register User
 - **name**: minimal 3 karakter
@@ -342,7 +342,7 @@ router.post("/", authenticate, createEvent);
 
 ---
 
-## 🗂️ Struktur Folder
+## Struktur Folder
 
 ```
 be/
@@ -375,7 +375,7 @@ be/
 
 ---
 
-## 🚧 Development Notes
+## Development Notes
 
 - Saat ini menggunakan **in-memory storage** untuk development
 - Untuk production, implementasikan:
@@ -390,7 +390,7 @@ be/
 
 ---
 
-## 🔄 Status Codes
+## Status Codes
 
 - `200` - OK
 - `201` - Created
@@ -404,7 +404,7 @@ be/
 
 ---
 
-## 📞 Support
+## Support
 
 Untuk pertanyaan atau bantuan, hubungi tim INVOFEST.
 
