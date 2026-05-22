@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { prisma } from "../lib/db.js";
 import { Event } from "../types/event.js";
 
-// CREATE Event
+
 export const createEvent = async (req: Request, res: Response) => {
     try {
         const { name, categoryId, pembicaraId, location, dateEvent, description } = req.body as Event & { dateEvent: string };
@@ -28,7 +28,7 @@ export const createEvent = async (req: Request, res: Response) => {
     }
 };
 
-// READ All Events (include relasi Category & Pembicara)
+
 export const getEvents = async (req: Request, res: Response) => {
     try {
         const events = await prisma.event.findMany({
@@ -44,7 +44,7 @@ export const getEvents = async (req: Request, res: Response) => {
     }
 };
 
-// READ Single Event
+
 export const getEventById = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
@@ -66,7 +66,7 @@ export const getEventById = async (req: Request, res: Response) => {
     }
 };
 
-// UPDATE Event
+
 export const updateEvent = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
@@ -96,7 +96,7 @@ export const updateEvent = async (req: Request, res: Response) => {
     }
 };
 
-// DELETE Event
+
 export const deleteEvent = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);

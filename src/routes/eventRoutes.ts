@@ -10,11 +10,11 @@ import express from "express";
 
 const router = express.Router();
 
-// GET routes — publik (tanpa auth)
+
 router.get("/", getEvents);
 router.get("/:id", getEventById);
 
-// POST, PUT, DELETE — dilindungi auth middleware
+
 router.post("/", authenticate, createEvent);
 router.put("/:id", authenticate, updateEvent);
 router.delete("/:id", authenticate, deleteEvent);

@@ -1,29 +1,29 @@
-// 1. Generator: library yang akan dihasilkan
+
 generator client {
   provider = "prisma-client-js"
 }
 
-// 2. Datasource: jenis database yang digunakan
+
 datasource db {
   provider  = "postgresql"
 }
 
-// 3. Models: definisi tabel
 
-// Tabel 1: CategoryEvent — kategori event
+
+
 model Category {
   id        Int      @id @default(autoincrement())
   name      String
   createdAt DateTime @default(now()) @map("created_at")
 
-  // Relasi: satu category bisa punya banyak event & seminar
+
   events   Event[]
   seminars Seminar[]
 
   @@map("categories")
 }
 
-// Tabel 2: Pembicara — data pembicara/speaker
+
 model Pembicara {
   id        Int      @id @default(autoincrement())
   name      String
@@ -33,14 +33,14 @@ model Pembicara {
   expertise String[] @default([])
   createdAt DateTime @default(now()) @map("created_at")
 
-  // Relasi: satu pembicara bisa jadi speaker di banyak seminar & event
+
   seminars Seminar[]
   events   Event[]
 
   @@map("pembicaras")
 }
 
-// Tabel 3: Event — data event dengan FK ke Category dan Pembicara
+
 model Event {
   id           Int      @id @default(autoincrement())
   name         String
@@ -51,14 +51,14 @@ model Event {
   description  String   @db.Text
   createdAt    DateTime @default(now()) @map("created_at")
 
-  // Relasi ke Category & Pembicara (Foreign Key)
+
   category  Category  @relation(fields: [categoryId], references: [id])
   pembicara Pembicara @relation(fields: [pembicaraId], references: [id])
 
   @@map("events")
 }
 
-// Tabel User: untuk autentikasi login via NIM
+
 model User {
   id        Int      @id @default(autoincrement())
   name      String
@@ -66,6 +66,7 @@ model User {
   password  String
   bio       String   @db.Text
   event     String
+  photo     String   @default("")
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("users")
@@ -84,7 +85,7 @@ model Seminar {
   registeredParticipants  Int      @default(0) @map("registered_participants")
   createdAt               DateTime @default(now()) @map("created_at")
 
-  // Relasi
+
   speaker  Pembicara @relation(fields: [speakerId], references: [id])
   category Category  @relation(fields: [categoryId], references: [id])
 

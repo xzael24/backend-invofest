@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { prisma } from "../lib/db.js";
 import { Category } from "../types/category.js";
 
-// CREATE Category
+
 export const createCategory = async (req: Request, res: Response) => {
     try {
         const { name } = req.body as Category;
@@ -21,7 +21,7 @@ export const createCategory = async (req: Request, res: Response) => {
     }
 };
 
-// READ All Categories
+
 export const getCategories = async (req: Request, res: Response) => {
     try {
         const categories = await prisma.category.findMany({
@@ -33,7 +33,7 @@ export const getCategories = async (req: Request, res: Response) => {
     }
 };
 
-// READ Single Category
+
 export const getCategoryById = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
@@ -49,7 +49,7 @@ export const getCategoryById = async (req: Request, res: Response) => {
     }
 };
 
-// UPDATE Category
+
 export const updateCategory = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
@@ -74,7 +74,7 @@ export const updateCategory = async (req: Request, res: Response) => {
     }
 };
 
-// DELETE Category
+
 export const deleteCategory = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);

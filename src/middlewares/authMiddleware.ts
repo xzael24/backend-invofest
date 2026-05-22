@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-key-change-in-production";
 
-// Interface untuk extend Request dengan user
+
 export interface AuthRequest extends Request {
     user?: {
         id: number;
@@ -11,7 +11,7 @@ export interface AuthRequest extends Request {
     };
 }
 
-// Middleware untuk validasi JWT token
+
 export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
 
@@ -19,17 +19,17 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
         return res.status(401).json({ message: "Token tidak ditemukan" });
     }
 
-    const token = authHeader.split(" ")[1]; // Format: "Bearer <token>"
+    const token = authHeader.split(" ")[1];
 
     if (!token) {
         return res.status(401).json({ message: "Format token tidak valid" });
     }
 
     try {
-        // Verifikasi JWT token
+
         const decoded = jwt.verify(token, JWT_SECRET) as { id: number; nim: string };
 
-        // Set user di request
+
         req.user = {
             id: decoded.id,
             nim: decoded.nim,

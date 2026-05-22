@@ -1,5 +1,7 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
+import fs from "fs";
 
 import eventRoutes from "./routes/eventRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
@@ -13,7 +15,14 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 
-// Routes
+// Serve static uploads directory
+const uploadDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+app.use("/uploads", express.static(uploadDir));
+
+
 app.use("/api/events", eventRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/users", userRoutes);

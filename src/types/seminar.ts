@@ -5,8 +5,8 @@ export interface Seminar {
     date: Date;
     time: string;
     location: string;
-    speaker: number; // ID pembicara
-    category: number; // ID kategori
+    speaker: number;
+    category: number;
     maxParticipants: number;
     registeredParticipants: number;
 }

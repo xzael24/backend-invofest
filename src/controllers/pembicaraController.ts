@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { prisma } from "../lib/db.js";
 import { Pembicara } from "../types/pembicara.js";
 
-// CREATE Pembicara
+
 export const createPembicara = async (req: Request, res: Response) => {
     try {
         const { name, title, bio, photo, expertise } = req.body as Pembicara;
@@ -27,7 +27,7 @@ export const createPembicara = async (req: Request, res: Response) => {
     }
 };
 
-// READ All Pembicaras
+
 export const getPembicaras = async (req: Request, res: Response) => {
     try {
         const pembicaras = await prisma.pembicara.findMany({
@@ -39,7 +39,7 @@ export const getPembicaras = async (req: Request, res: Response) => {
     }
 };
 
-// READ Single Pembicara
+
 export const getPembicaraById = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
@@ -55,7 +55,7 @@ export const getPembicaraById = async (req: Request, res: Response) => {
     }
 };
 
-// UPDATE Pembicara
+
 export const updatePembicara = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
@@ -84,7 +84,7 @@ export const updatePembicara = async (req: Request, res: Response) => {
     }
 };
 
-// DELETE Pembicara
+
 export const deletePembicara = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);

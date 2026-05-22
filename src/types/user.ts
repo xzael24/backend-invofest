@@ -5,6 +5,7 @@ export interface User {
     password: string;
     bio: string;
     event: string;
+    photo: string;
     createdAt: Date;
 }
 

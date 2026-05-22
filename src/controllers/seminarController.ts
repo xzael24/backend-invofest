@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/db.js";
 
-// CREATE Seminar
+
 export const createSeminar = async (req: Request, res: Response) => {
     try {
         const { title, description, date, time, location, speaker, category, maxParticipants } = req.body;
@@ -30,7 +30,7 @@ export const createSeminar = async (req: Request, res: Response) => {
     }
 };
 
-// READ All Seminars
+
 export const getSeminars = async (req: Request, res: Response) => {
     try {
         const seminars = await prisma.seminar.findMany({
@@ -46,7 +46,7 @@ export const getSeminars = async (req: Request, res: Response) => {
     }
 };
 
-// READ Single Seminar
+
 export const getSeminarById = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
@@ -68,7 +68,7 @@ export const getSeminarById = async (req: Request, res: Response) => {
     }
 };
 
-// UPDATE Seminar
+
 export const updateSeminar = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
@@ -100,7 +100,7 @@ export const updateSeminar = async (req: Request, res: Response) => {
     }
 };
 
-// DELETE Seminar
+
 export const deleteSeminar = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
@@ -117,7 +117,7 @@ export const deleteSeminar = async (req: Request, res: Response) => {
     }
 };
 
-// REGISTER to Seminar
+
 export const registerToSeminar = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);

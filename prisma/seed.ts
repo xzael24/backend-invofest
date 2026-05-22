@@ -1,4 +1,4 @@
-/// <reference types="node" />
+
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pkg from "pg";
@@ -13,7 +13,7 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
     console.log("Mulai seeding database...\n");
 
-    // ========== 0. CLEAN UP ==========
+
     console.log("Membersihkan data lama...");
     await prisma.user.deleteMany();
     await prisma.seminar.deleteMany();
@@ -22,7 +22,7 @@ async function main() {
     await prisma.category.deleteMany();
     console.log("Data lama berhasil dihapus!\n");
 
-    // ========== 1. CATEGORIES ==========
+
     console.log("Membuat categories...");
     const catSeminar = await prisma.category.create({ data: { name: "Seminar" } });
     const catWorkshop = await prisma.category.create({ data: { name: "Workshop" } });
@@ -30,7 +30,7 @@ async function main() {
     const catCompetition = await prisma.category.create({ data: { name: "Competition" } });
     console.log(`    ${4} categories dibuat\n`);
 
-    // ========== 2. PEMBICARA (Speakers) ==========
+
     console.log(" Membuat pembicara...");
 
     const dery = await prisma.pembicara.create({
@@ -125,7 +125,7 @@ async function main() {
 
     console.log(`    ${9} pembicara dibuat\n`);
 
-    // ========== 3. EVENTS (dengan FK ke Category dan Pembicara) ==========
+
     console.log(" Membuat events...");
 
     await prisma.event.create({
@@ -178,7 +178,7 @@ async function main() {
 
     console.log(`    ${4} events dibuat\n`);
 
-    // ========== 4. SEMINARS ==========
+
     console.log("🎓 Membuat seminars...");
 
     await prisma.seminar.create({
@@ -248,10 +248,10 @@ async function main() {
 
     console.log(`    ${5} seminars dibuat\n`);
 
-    // ========== 5. USER (untuk login via NIM) ==========
+
     console.log("Membuat user...");
 
-    // Hash password dengan bcrypt sebelum disimpan
+
     const hashedPassword = await bcrypt.hash("password123", 10);
 
     await prisma.user.create({
