@@ -9,11 +9,11 @@ const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-key-change-in-prod
 // REGISTER User
 export const register = async (req: Request, res: Response) => {
     try {
-        const { name, nim, password, bio, event } = req.body as RegisterRequest;
+        const { name, nim, password, bio = "", event } = req.body as RegisterRequest;
 
         // Validasi input
-        if (!name || !nim || !password || !bio || !event) {
-            return res.status(400).json({ message: "Semua field wajib diisi" });
+        if (!name || !nim || !password || !event) {
+            return res.status(400).json({ message: "Semua field (kecuali bio) wajib diisi" });
         }
 
         // Validasi NIM format (hanya angka, minimal 8 digit)
@@ -34,11 +34,6 @@ export const register = async (req: Request, res: Response) => {
         const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).+$/;
         if (!passwordRegex.test(password)) {
             return res.status(400).json({ message: "Password harus berisi huruf dan angka" });
-        }
-
-        // Validasi bio minimal 20 karakter
-        if (bio.length < 20) {
-            return res.status(400).json({ message: "Bio minimal 20 karakter" });
         }
 
         // Cek apakah NIM sudah terdaftar

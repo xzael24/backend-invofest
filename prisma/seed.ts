@@ -1,11 +1,26 @@
 /// <reference types="node" />
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import pkg from "pg";
+const { Pool } = pkg;
+import "dotenv/config";
 import bcrypt from "bcryptjs";
 
-const prisma = new PrismaClient();
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
     console.log("Mulai seeding database...\n");
+
+    // ========== 0. CLEAN UP ==========
+    console.log("Membersihkan data lama...");
+    await prisma.user.deleteMany();
+    await prisma.seminar.deleteMany();
+    await prisma.event.deleteMany();
+    await prisma.pembicara.deleteMany();
+    await prisma.category.deleteMany();
+    console.log("Data lama berhasil dihapus!\n");
 
     // ========== 1. CATEGORIES ==========
     console.log("Membuat categories...");

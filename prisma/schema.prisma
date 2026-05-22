@@ -6,8 +6,6 @@ generator client {
 // 2. Datasource: jenis database yang digunakan
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
 // 3. Models: definisi tabel
