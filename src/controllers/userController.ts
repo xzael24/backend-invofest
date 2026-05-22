@@ -4,8 +4,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import type { LoginRequest, RegisterRequest } from "../types/user.js";
 import { AuthRequest } from "../middlewares/authMiddleware.js";
-import fs from "fs/promises";
-import path from "path";
 
 const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-key-change-in-production";
 
@@ -156,25 +154,16 @@ export const deleteUser = async (req: Request, res: Response) => {
 
 export const uploadPhoto = async (req: AuthRequest, res: Response) => {
     try {
-        if (!req.file) {
-            return res.status(400).json({ message: "File foto tidak ditemukan" });
+        const { photo } = req.body;
+        if (!photo) {
+            return res.status(400).json({ message: "Foto profil tidak ditemukan" });
         }
 
         const userId = req.user!.id;
 
-        const user = await prisma.user.findUnique({ where: { id: userId } });
-        if (user && user.photo) {
-            if (user.photo.startsWith("/uploads/")) {
-                const oldPath = path.join(process.cwd(), user.photo);
-                await fs.unlink(oldPath).catch(() => {});
-            }
-        }
-
-        const photoUrl = `/uploads/${req.file.filename}`;
-
         const updatedUser = await prisma.user.update({
             where: { id: userId },
-            data: { photo: photoUrl },
+            data: { photo: photo },
         });
 
         const { password: _, ...userWithoutPassword } = updatedUser;
