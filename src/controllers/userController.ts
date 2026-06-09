@@ -152,6 +152,52 @@ export const deleteUser = async (req: Request, res: Response) => {
     }
 };
 
+export const updateUser = async (req: Request, res: Response) => {
+    try {
+        const id = Number(req.params.id);
+        const existingUser = await prisma.user.findUnique({ where: { id } });
+
+        if (!existingUser) {
+            return res.status(404).json({ message: "User tidak ditemukan" });
+        }
+
+        const { name, bio, event, password } = req.body;
+
+        if (name !== undefined && name.length < 3) {
+            return res.status(400).json({ message: "Nama minimal 3 karakter" });
+        }
+
+        if (password !== undefined) {
+            if (password.length < 8) {
+                return res.status(400).json({ message: "Password minimal 8 karakter" });
+            }
+            const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).+$/;
+            if (!passwordRegex.test(password)) {
+                return res.status(400).json({ message: "Password harus berisi huruf dan angka" });
+            }
+        }
+
+        const updateData: any = {};
+        if (name !== undefined) updateData.name = name;
+        if (bio !== undefined) updateData.bio = bio;
+        if (event !== undefined) updateData.event = event;
+        if (password !== undefined) updateData.password = await bcrypt.hash(password, 10);
+
+        const updatedUser = await prisma.user.update({
+            where: { id },
+            data: updateData,
+        });
+
+        const { password: _, ...userWithoutPassword } = updatedUser;
+        res.json({
+            message: "User berhasil diperbarui",
+            user: userWithoutPassword,
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Gagal memperbarui user", error });
+    }
+};
+
 export const uploadPhoto = async (req: AuthRequest, res: Response) => {
     try {
         const { photo } = req.body;
